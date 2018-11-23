@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block header_title %}XIAOBAI-Blog{% endblock %}
+
+{% block header_subtitle %}博观而约取，厚积而薄发{% endblock %}
+
+{% block content %}
+<h2>所有文章</h2>
+<ul class="post-list">
+    {% for i in blog %}
+        <li class="post-item">
+            <span class="post-datetime">{{ i.create_time }}</span>
+            <a href="{% url 'blog_content' i.title %}" class="post-link">{{ i.title }}</a>
+        </li>
+        {% empty %}
+        没有博客数据
+    {% endfor %}
+</ul>
+{% endblock %}

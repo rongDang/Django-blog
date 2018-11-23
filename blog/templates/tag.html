@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block header_title %}标签:{{ title }}{% endblock %}
+
+{% block header_subtitle %}包含该标签的博客{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+    <ul class="post-list">
+    {% for p in result %}
+        <li class="post-item">
+            <a href="{% url 'blog_content' p.title %}" class="post-link">{{p.title}}</a>
+        </li>
+        {% empty %}
+        没有包含该标签的内容或博客被删除
+    {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block header_subtitle %}所有的标签如下{% endblock %}
+
+{% block content %}
+    <ul class="nav nav-pills" role="tablist">
+        {% for d in tags %}
+            <li role="presentation">
+                <a href="{% url 'blog_tag' d.name %}">{{d.name}}<span class="badge">{{ d.number }}</span></a>
+            </li>
+            {% empty %}
+            没有标签数据
+        {% endfor %}
+    </ul>
+{% endblock %}

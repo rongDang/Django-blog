@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block header_title %}分类:{{ title }}{% endblock %}
+
+{% block header_subtitle %}该类别的所有博客如下{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+        <ul class="post-list">
+        {% for t in result %}
+            <li class="post-item">
+                <span>{{ t.create_time }}</span>
+                <a href="{% url 'blog_content' t.title %}" class="post-link">{{ t.title }}</a>
+            </li>
+            {% empty %}
+            该分类下没有博客
+        {% endfor %}
+        </ul>
+{% endblock %}

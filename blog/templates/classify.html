@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block header_subtitle %}所有的分类都在这了{% endblock %}
+
+{% block content %}
+    <ul class="nav nav-pills" role="tablist">
+        {% for cate in categories %}
+            <li role="presentation">
+                <a href="{% url 'blog_class_details' cate %}">{{cate}}<span class="badge">{{ cate.number }}</span></a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
+

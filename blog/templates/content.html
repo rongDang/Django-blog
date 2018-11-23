@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+<!--博客内容页面-->
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/code.css' %}">
+{% endblock %}
+
+<!--标题，分类-->
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block data %}
+    <p class="header-date">
+        <span class="post-time">
+            <span class="glyphicon glyphicon-calendar"></span> 日期:{{ data.create_time }}
+        </span>
+        <span class="post-category">
+            <span class="glyphicon glyphicon-folder-open"></span> 分类:
+            <a href="{% url 'blog_class_details' categoty %}">{{ categoty }}</a>
+        </span>
+    </p>
+{% endblock %}
+
+<!--标签-->
+{% block header_subtitle %}
+    {% for t in tags %}
+        <span class="glyphicon glyphicon-tags"></span><a href="{% url 'blog_tag' t.name %}"> {{ t.name }}</a>
+        {% empty %}
+        没有标签
+    {% endfor %}
+{% endblock %}
+
+<!--博客内容-->
+{% block content %}
+    {{ content|safe }}
+{% endblock %}
+
+<!--JavaScript-->
+{% block js %}
+    $(function(){
+        //给标签添加bootstrap类，使其靠右
+        $(".header-subtitle").addClass("pull-right")
+    })
+{% endblock %}
