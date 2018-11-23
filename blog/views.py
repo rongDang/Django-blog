@@ -36,6 +36,11 @@ def blog_class_details(request, title):
 
 def tags(request, title):
     tags = Tag.objects.all()
+    obj_tag_list = Tag.objects.all()
+    for obj_tag in obj_tag_list:
+        tag_number = obj_tag.blog_set.count()
+        obj_tag.number = tag_number
+        obj_tag.save()
     return render(request, 'tags.html', locals())
 
 
