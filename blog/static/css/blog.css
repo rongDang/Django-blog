@@ -99,17 +99,17 @@ code {
 }
 
 @media (min-width: 768px) {
-  .header-container,.main-container,.footer-container {
+  .header-container,.main-container,.footer-container,.main_page {
     width: 750px;
   }
 }
 @media (min-width: 992px) {
-  .header-container,.main-container,.footer-container {
+  .header-container,.main-container,.footer-container,.main_page {
     width: 850px;
   }
 }
 @media (min-width: 1200px) {
-  .header-container,.main-container,.footer-container {
+  .header-container,.main-container,.footer-container,.main_page {
     width: 950px;
   }
 }
@@ -232,6 +232,11 @@ li.post-item a:hover {
     border-bottom: 1px solid #145ba2;
 }
 
+.navigation{
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 0;
+}
 
 /* footer css */
 #footer {

@@ -9,6 +9,7 @@
     <ul class="post-list">
     {% for p in result %}
         <li class="post-item">
+            <span>{{ p.create_time }}</span>
             <a href="{% url 'blog_content' p.title %}" class="post-link">{{p.title}}</a>
         </li>
         {% empty %}

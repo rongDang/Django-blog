@@ -38,8 +38,19 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
-    'mdeditor',
+    'mdeditor',     # markdown富文本编辑器
+    'pure_pagination',  # 分页插件
+    'django_comments',     # 评论插件
+    'django.contrib.sites'
 ]
+SITE_ID = 1  # django评论库是一个站点，所以需要添加sites的应用，并设置当前django工程的站点id=1
+
+PAGINATION_SETTINGS = {
+    'PAGE_RANGE_DISPLAYED': 3,    # 中间显示的个数
+    'MARGIN_PAGES_DISPLAYED': 2,  # 两边显示的个数
+
+    'SHOW_FIRST_PAGE_WHEN_INVALID': True,
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

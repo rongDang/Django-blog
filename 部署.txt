@@ -1,0 +1,89 @@
+# 在服务器上安装nginx ，MySQL， python3.6，pip3,创建虚拟环境，安装uwsgi
+
+1，安装nginx:
+    先安装epel-release源，并进行安装：1.yum install epel-release 2.yum update 3.yum install nginx
+
+    防火墙执行相关的应用操作: systemctl start nginx(启动)  systemctl stop nginx #停止
+    systemctl restart nginx #重启  systemctl status nginx #查看运行状态  systemctl enable nginx #开机启动
+    pkill -f nginx (关闭nginx)   nginx(启动)
+
+2，安装MySQL8.0:
+    1、yum仓库下载MySQL：sudo yum localinstall https://repo.mysql.com//mysql80-community-release-el7-1.noarch.rpm
+
+    2、yum安装MySQL：sudo yum install mysql-community-server
+
+    3、启动MySQL服务：sudo service mysqld start
+
+    4、检查MySQL服务状态：sudo service mysqld status
+
+    5、查看初始密码（如无内容直接跳过）：sudo grep 'temporary password' /var/log/mysqld.log
+    建议直接 vim /etc/my.cnf ，在配置文件中添加 skip-grant-tables(跳过密码验证)，然后再 mysql -u root -p 登录
+
+    6. 更改密码: use mysql; ---> update user set authentication_string='' where user='root';(将root密码置空)
+    --->删除my.cnf中的skip-grant-tables --->service mysqld restart(重启MySQL服务)--->登录MySQL
+    --->mysql> ALTER user 'root'@'localhost' IDENTIFIED BY 'Root123!';(密码太简单不会通过)
+
+    7.关于MySQL8.0版本的远程访问权限设置：（新版的的mysql版本已经将创建账户和赋予权限的方式分开了）
+        select host, user, authentication_string, plugin from user; 查看相关信息可知，root用户只支持本地访问
+        GRANT ALL ON *.* TO 'root'@'%'; 授权root用户的所有权限并设置远程访问，修改后再查看root的host已经变为%
+        使用Navicat等可视化工具连接时输入用户，密码，会提示2059错误，这是因为 MySql8.0版本和旧版本的加密规则不一样，
+        而现在的可视化工具只支持旧的加密方式，所以需要更改MySQL8.0用户登录的加密规则：mysql_native_password
+
+        ALTER USER 'root'@'%' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER; 修改加密规则
+        ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password'; 更新root用户密码
+
+        使用Navicat数据库连接mysql8.0版本时可能会提示2059 - authentication plugin 解决办法如下：
+        alter user 'root'@'localhost' identified with mysql_native_password by '你的密码';
+
+3.安装python3.6
+    CentOS7.3默认安装了python2.7.5，可以同过python -V来查看python版本，which python来查看python.exe文件位置
+    1.安装相关包：
+        yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel readline-devel tk-devel gcc make
+    2.编译安装python3：
+        wget https://www.python.org/ftp/python/3.6.7/Python-3.6.7.tar.xz
+    3.解压:tar -xvJf  Python-3.6.7.tar.xz
+    进入到解压后的目录: cd Python-3.6.7
+    4.编译安装：
+        ./configure prefix=/usr/local/python3  --> make && make install
+    添加软连接:
+        ln -s /usr/local/python3/bin/python3 /usr/bin/python3
+
+    安装pip3
+        将之前安装的python3中的pip3添加上软连接就可以:ln -s /usr/local/python3/bin/pip3 /usr/bin/pip3
+
+    更新pip:
+        pip install --upgrade pip(默认更新python2的pip)
+        pip3 install --upgrade pip 更新python3的pip
+
+
+pip freeze > requirements.txt 导出项目依赖的包名到文件中
+创建虚拟环境：
+    1，安装安装virtualenv
+        pip install virtualenv   #安装到python2中
+        pip3 install virtualenv  #安装到python3中
+    2，安装virtualenvwrapper
+        pip install virtualenvwrapper   #安装到python2中
+        pip3 install virtualenvwrapper   #安装到python3中
+    3，查找位置:
+        find / -name virtualenvwrapper.sh
+    4，编辑配置文件
+        cd~  -->  vim ~/.bashrc
+        添加下面两个命令到最后，用来指定虚拟环境的位置。
+            export WORKON_HOME=~/.virtualenvs
+            source /usr/local/python3/bin/virtualenvwrapper.sh
+        执行.bashrc使文件生效: source ~/.bashrc
+    5,创建虚拟环境
+        mkvirtualenv -p /usr/bin/python3 env_name  (最后的env_name为虚拟环境的名称)
+
+    在虚拟环境中安装requirements.txt文件中所有的包(requirements.txt文件通过WinSCP软件上传到CentOS上去)
+
+在CentOS的python虚拟环境中下载这些依赖包:pip install -r requirements.txt
+错误一：
+出现Command "python setup.py egg_info" failed with error code 1 in /tmp/pip-build*解决办法
+    解决：easy_install -U setuptools
+
+错误二：
+    安装mysqlclient时可能会出错，显示OSError: mysql_config not found，mysql_config 找不到,
+    所以导致mysqlclient安装不上,centos需要再安装下面这些依赖就可以有mysql_config了.
+    解决：yum install mysql-devel gcc gcc-devel python-devel
+

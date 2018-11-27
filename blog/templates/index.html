@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block head %}
+    <style>
+        ul li a{color: black;}
+    </style>
+{% endblock %}
 
 {% block header_title %}XIAOBAI-Blog{% endblock %}
 
@@ -8,7 +13,7 @@
 {% block content %}
 <h2>所有文章</h2>
 <ul class="post-list">
-    {% for i in blog %}
+    {% for i in data.object_list %}
         <li class="post-item">
             <span class="post-datetime">{{ i.create_time }}</span>
             <a href="{% url 'blog_content' i.title %}" class="post-link">{{ i.title }}</a>
@@ -17,4 +22,37 @@
         没有博客数据
     {% endfor %}
 </ul>
+{% endblock %}
+
+{% block page %}
+    <nav aria-label="Page navigation">
+        <ul class="pager">
+            {% if data.has_previous %}
+                <li class="previous"><a href="?{{ data.previous_page_number.querystring }}"><span aria-hidden="true">&larr;</span> Older</a></li>
+            {% else %}
+                <!--没有上一页则不可点击-->
+                <li class="previous disabled"><a href="#"><span aria-hidden="true">&larr;</span> Older</a></li>
+            {% endif %}
+
+            <!--data.pages是总共的页数-->
+            {% for page in data.pages %}
+                {% if page %}
+                    {% ifequal page data.number %}
+                        <!--判断是当前页数则显示如下-->
+                        <li class="active"><a style="background-color: black;color: white" href="?{{ page.querystring }}">{{ page }}</a></li>
+                    {% else %}
+                        <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
+                    {% endifequal %}
+                {% else %}
+                    <li class="none"><a href="">...</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if data.has_next %}
+                <li class="next"><a href="?{{ data.next_page_number.querystring }}">Newer <span aria-hidden="true">&rarr;</span></a></li>
+            {% else %}
+                <li class="next disabled"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+            {% endif %}
+        </ul>
+    </nav>
 {% endblock %}

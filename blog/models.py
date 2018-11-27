@@ -6,7 +6,7 @@ from mdeditor.fields import MDTextField
 class Category(models.Model):
     name = models.CharField(verbose_name="博客类别", max_length=20)
     # number为该类别下存在多少博客
-    number = models.IntegerField()
+    number = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "类别"
@@ -19,7 +19,7 @@ class Category(models.Model):
 class Tag(models.Model):
     name = models.CharField(verbose_name="博客标签", max_length=20)
     # number为对应标签下存在的博客,这里设置默认值是因为该字段是后续添加的
-    number = models.IntegerField()
+    number = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "标签"

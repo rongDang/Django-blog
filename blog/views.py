@@ -1,10 +1,19 @@
 from django.shortcuts import render
+from pure_pagination import PageNotAnInteger, Paginator
 from blog.models import *
 import markdown
 
 
 def blog_index(request):
-    blog = Blog.objects.filter().values('id', 'title', 'create_time')
+    blog = Blog.objects.all().order_by("-create_time")
+    # 分页测试
+    try:
+        # 获取当前页面，默认为1
+        page = request.GET.get('page', 1)
+    except PageNotAnInteger:
+        page = 1
+    paginator = Paginator(blog, 2, request=request)
+    data = paginator.page(page)
     return render(request, 'index.html', locals())
 
 
@@ -37,6 +46,7 @@ def blog_class_details(request, title):
 def tags(request, title):
     tags = Tag.objects.all()
     obj_tag_list = Tag.objects.all()
+    # 更新标签的数量
     for obj_tag in obj_tag_list:
         tag_number = obj_tag.blog_set.count()
         obj_tag.number = tag_number

@@ -19,7 +19,12 @@
     在模型添加字段时，content = MDTextField()
     # 编写后的内容直接提交到数据库中，要看谋篇文章时再到数据库中读取对应的数据，用对应的包解析markdown语言？
 
+分页：使用django的分页器pure_pagination
 
+
+评论:1.Django的form表单显示,用户登录后才能评论，
+    2.使用来必力安装评论服务(只能在他们网站查看评论)
+    3.django的评论包django-contrib-comments
 
 分析：
     一篇博客所有的内容：博客标题，博客内容，博客发表时间，博客的分类，博客的点击量，博客的作者，
@@ -32,10 +37,11 @@
 
 
 
+#主要用了django-mdeditor开源项目，前端使用了nest的开源前端代码，后台定制了admin，分页使用Django的分页器
+
 
 1，自己写bootstrap样式，Django2.1+bootstrap4.1来写自己的博客，然后部署到服务器上去
-
-
+先把域名在阿里云备案，备案成功后，在域名控制台设置A解析，解析到服务器IP，在PHPstudy控制台把域名帮到网站上
 2，通过Hexo+GitHub page来创建我的博客。
 
 

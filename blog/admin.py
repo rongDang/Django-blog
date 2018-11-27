@@ -1,6 +1,7 @@
 from django.contrib import admin
 from blog.models import *
 
+# 初始后台登录页面的显示标题
 admin.site.site_header = '小白博客登录'
 admin.site.site_title = '登录账号'
 
@@ -8,11 +9,14 @@ admin.site.site_title = '登录账号'
 @admin.register(Category)
 class Category_Admin(admin.ModelAdmin):
     list_display = ('id', 'name')
+    # 不让数目显示出来
+    exclude = ('number', )
 
 
 @admin.register(Tag)
 class Tag_Admin(admin.ModelAdmin):
     list_display = ('id', 'name')
+    exclude = ('number',)
 
 
 @admin.register(Blog)
