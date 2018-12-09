@@ -34,7 +34,9 @@
     所以分类和博客是一对多的关系，这里通过外键来关联。
     而一篇博客可以有多个标签，每个标签也可以包含多个博客，这样的话，博客和标签是多对多的关系
 
-
+templates中的文件说明:
+    中间只有blog文件夹是项目的主要的HTML，其他的account，openid，socialaccount是改写allauth的HTML，
+    在allauth的基础上进行的改写，因为它自带的html太丑了，使用widget_tweaks重新进行了渲染，加上了bootstrap的属性
 
 
 #主要用了django-mdeditor开源项目，前端使用了nest的开源前端代码，后台定制了admin，分页使用Django的分页器

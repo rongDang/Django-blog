@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'blog/base.html' %}
 <!--博客内容页面-->
 {% load static comments %}
 {% block head %}
@@ -11,10 +11,10 @@
 {% block data %}
     <p class="header-date">
         <span class="post-time">
-            <span class="glyphicon glyphicon-calendar"></span> 日期:{{ data.create_time }}
-        </span>
+            <span class="glyphicon glyphicon-calendar"></span>{{ data.create_time }}
+        </span>|
         <span class="post-category">
-            <span class="glyphicon glyphicon-folder-open"></span> 分类:
+            <span class="glyphicon glyphicon-folder-open"></span>
             <a href="{% url 'blog_class_details' categoty %}">{{ categoty }}</a>
         </span>
     </p>

@@ -1,0 +1,40 @@
+{% extends "blog/base.html" %}
+
+{% load i18n %}
+{% load widget_tweaks %}
+
+{% block head %}
+    <style>
+    .main-container{
+        background-color: transparent;
+        box-shadow: none;
+    }
+    </style>
+{% endblock %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block header_title %}{% trans "Sign Up" %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <div class="row col-md-7 col-md-offset-2">
+{#            <p>{% blocktrans %}已经有账户了吗?那么请 <a href="{{ login_url }}">登录</a>.{% endblocktrans %}</p>#}
+            <form class="form-horizontal" id="signup_form" method="post" action="{% url 'account_signup' %}">
+                {% csrf_token %}
+                <!--自定义的方法渲染-->
+                {% include 'account/bs3_form.html' %}
+
+                {% if redirect_field_value %}
+                    <!--value里面的值代表注册后要跳转的地址-->
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                {% endif %}
+                <div class="form-group">
+                    <a href="{{ login_url }}" role="button" class="btn btn-default col-md-2 col-md-offset-4 col-xs-offset-3"><< {% trans "Sign In" %}</a>
+                    <button type="submit" class="btn btn-success col-md-2 col-md-offset-3">{% trans "Sign Up" %} >></button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

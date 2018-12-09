@@ -1,0 +1,30 @@
+{% extends "blog/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Verify Your E-mail Address" %}{% endblock %}
+{% block header_title %}{% trans "Verify Your E-mail Address" %}{% endblock %}
+
+{% block content %}
+{% url 'account_email' as email_url %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-7 col-md-offset-2">
+            <p>{% blocktrans %}This part of the site requires us to verify that
+            you are who you claim to be. For this purpose, we require that you
+            verify ownership of your e-mail address. {% endblocktrans %}</p>
+
+            <p>
+                {% blocktrans %}
+                    我们已经给你发了一封电子邮件验证。请点击这封邮件里面的链接。请如果您在几分钟内没有收到，请与我们联系。
+                {% endblocktrans %}
+            </p>
+
+            <p>{% blocktrans %}
+                <strong>Note:</strong>
+                你仍然可以 <a href="{{ email_url }}">更改您的电子邮件地址</a>.
+            {% endblocktrans %}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

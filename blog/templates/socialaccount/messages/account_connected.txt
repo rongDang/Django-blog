@@ -1,0 +1,2 @@
+{% load i18n %}
+{% blocktrans %}社交账户已经关联。{% endblocktrans %}

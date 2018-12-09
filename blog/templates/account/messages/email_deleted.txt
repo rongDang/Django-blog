@@ -1,0 +1,2 @@
+{% load i18n %}
+{% blocktrans %}删除电子邮件地址 {{email}}.{% endblocktrans %}

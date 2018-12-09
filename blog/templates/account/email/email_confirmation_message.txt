@@ -1,0 +1,7 @@
+{% load account %}{% user_display user as user_display %}{% load i18n %}{% autoescape off %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}来自 {{ site_name }} 的问候!
+
+您收到这封电子邮件是因为 {{ user_display }} 用户已经将您的电子邮件地址作为连接他们帐户的电子邮件地址。
+要确认这是正确的，请转到：{{ activate_url }}
+{% endblocktrans %}{% endautoescape %}
+{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}谢谢你访问 {{ site_name }}!
+{{ site_domain }}{% endblocktrans %}

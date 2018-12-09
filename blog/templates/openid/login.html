@@ -1,0 +1,27 @@
+{% extends "blog/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}OpenID Sign In{% endblock %}
+{% block header_title %}{% trans 'OpenID Sign In' %}{% endblock %}
+
+{% block head %}
+    <style>
+    .main-container{
+        background-color: transparent;
+        box-shadow: none;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row col-md-7 col-md-offset-2">
+            <form id="openid_login_form" class="form-horizontal" method="post" action="{% url 'openid_login' %}">
+                {% csrf_token %}
+                {% include 'account/bs3_form.html' %}
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

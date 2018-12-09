@@ -1,0 +1,33 @@
+{% extends 'blog/base.html' %}
+
+{% block header_title %}个人信息{% endblock %}
+{% block head %}
+    <style>
+    .main-container{
+        background-color: transparent;
+        box-shadow: none;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row col-md-8 col-md-offset-2">
+            <div class="panel panel-default">
+                <div class="panel-heading">我的信息</div>
+                <div class="panel-body">
+                    <div>
+                        <p style="font-size: 30px;margin-left: 15px"><strong>{{ user.username }}</strong></p>
+                        <ul class="nav nav-pills">
+                            <li role="presentation"><a href="#">修改昵称</a></li>
+                            <li role="presentation"><a href="/accounts/password/change/">修改密码</a></li>
+                        </ul>
+                    </div>
+                    <ul class="list-inline" style="margin-left: 10px">
+                        <li><span>最新登录:</span>sadasdsadsad</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

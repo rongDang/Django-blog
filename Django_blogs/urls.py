@@ -21,9 +21,11 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', include('blog.urls')),
     path('mdeditor/', include('mdeditor.urls')),
     path('comments/', include('django_comments.urls')),
-    path('', include('blog.urls'))
+    # django-allauth的路径
+    path('accounts/', include('allauth.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

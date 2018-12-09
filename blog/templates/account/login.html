@@ -1,0 +1,57 @@
+{% extends "blog/base.html" %}
+
+{% load i18n %}
+{% load account socialaccount %}
+{% load widget_tweaks %}
+
+{% block head %}
+    <style>
+    .main-container{
+        background-color: transparent;
+        box-shadow: none;
+    }
+    </style>
+{% endblock %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+{% block header_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-7 col-md-offset-2">
+                <form class="form-horizontal" method="POST" action="{% url 'account_login' %}">
+                    {% csrf_token %}
+
+                    {% include 'account/bs3_form.html' %}
+
+                    {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                    {% endif %}
+                    <div class="form-group">
+                        <a href="{{ signup_url }}" role="button" class="btn btn-default col-md-2 col-md-offset-4 col-xs-offset-4"><< {% trans "Sign Up" %}</a>
+                        <button type="submit" class="btn btn-success col-md-2 col-md-offset-3">{% trans "Sign In" %} >></button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-12">
+                {% get_providers as socialaccount_providers %}
+                {% if socialaccount_providers %}
+                    <div class="socialaccount_ballot">
+                        <ul class="socialaccount_providers list-inline">
+                            <li>第三方账号登录:</li>
+                            {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+                            <li>
+                                <a class="btn col-md-offset-2" href="{% url 'account_reset_password' %}">{% trans "Forgot Password?" %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% include "socialaccount/snippets/login_extra.html" %}
+                {% else %}
+                    <p>{% blocktrans %}如果您还没有创建帐户,请
+                        <a href="{{ signup_url }}">注册</a>一个账号.{% endblocktrans %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

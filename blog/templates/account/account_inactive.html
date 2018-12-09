@@ -1,0 +1,23 @@
+{% extends "blog/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Account Inactive" %}{% endblock %}
+
+{% block head %}
+    <style>
+    .main-container{
+        background-color: transparent;
+        box-shadow: none;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row col-md-7 col-md-offset-2">
+            <h1>{% trans "Account Inactive" %}</h1>
+            <p>{% trans "This account is inactive." %}</p>
+        </div>
+    </div>
+{% endblock %}

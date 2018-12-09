@@ -1,0 +1,25 @@
+{% extends "blog/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Social Network Login Failure" %}{% endblock %}
+{% block header_title %}{% trans "Social Network Login Failure" %}{% endblock %}
+
+{% block head %}
+    <style>
+    .main-container{
+        background-color: transparent;
+        box-shadow: none;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-7 col-md-offset-2">
+                <p>{% trans "An error occurred while attempting to login via your social network account." %}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}

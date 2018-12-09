@@ -99,19 +99,25 @@ code {
 }
 
 @media (min-width: 768px) {
-  .header-container,.main-container,.footer-container,.main_page {
-    width: 750px;
-  }
+    .header-container, .main-container, .footer-container, .main_page {
+        width: 750px;
+    }
+    /*设置.container是为了兼容登录注册页面中的表单显示*/
+    .container{width: 700px}
 }
+
 @media (min-width: 992px) {
-  .header-container,.main-container,.footer-container,.main_page {
-    width: 850px;
-  }
+    .header-container, .main-container, .footer-container, .main_page {
+        width: 850px;
+    }
+    .container{width: 800px}
 }
+
 @media (min-width: 1200px) {
-  .header-container,.main-container,.footer-container,.main_page {
-    width: 950px;
-  }
+    .header-container, .main-container, .footer-container, .main_page {
+        width: 950px;
+    }
+    .container{width: 900px}
 }
 
 .header-container {

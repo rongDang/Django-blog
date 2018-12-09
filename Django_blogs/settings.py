@@ -38,10 +38,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'blog.apps.BlogConfig',
+
     'mdeditor',     # markdown富文本编辑器
     'pure_pagination',  # 分页插件
     'django_comments',     # 评论插件
-    'django.contrib.sites'
+    'widget_tweaks',
+    'django.contrib.sites',  # 站点
+    
+    'allauth',  # 管理用户注册登录的第三方包
+    'allauth.account',
+    'allauth.socialaccount',
+    # 第三方账号关联，测试使用GitHub
+    'allauth.socialaccount.providers.github',
+    'allauth.socialaccount.providers.baidu',
+    'allauth.socialaccount.providers.google',
+    # 'allauth.socialaccount.providers.qq',
 ]
 SITE_ID = 1  # django评论库是一个站点，所以需要添加sites的应用，并设置当前django工程的站点id=1
 
@@ -140,3 +151,26 @@ STATIC_URL = '/static/'
 # 配置媒体文件，
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# 关于allauth的基本设定
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'  # 当用户登录时，既可以使用用户名也可以使用email
+ACCOUNT_EMAIL_REQUIRED = True       # 注册时必须填写email
+LOGIN_REDIRECT_URL = '/profile/个人中心'    # 设置登录后跳转链接
+
+
+# django-allauth相关设置
+AUTHENTICATION_BACKENDS = (
+    # django admin使用的用户登录于django-allauth无关
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+# django的邮箱设定，使用allauth的话，注册后它会给邮箱发送一条注册信息给注册邮箱验证
+EMAIL_HOST = 'smtp.qq.com'  # 这里使用QQ的smtp服务
+EMAIL_PORT = 25
+EMAIL_HOST_USER = '2801293031@qq.com'   # 你的 QQ 账号和授权码
+EMAIL_HOST_PASSWORD = 'vdltztnwuggbddei'
+EMAIL_USE_TLS = True  # 这里必须是 True，否则发送不成功
+EMAIL_FROM = '2801293031@qq.com'  # 发件人邮箱
+DEFAULT_FROM_EMAIL = '2801293031@qq.com'    # 默认发件人邮箱

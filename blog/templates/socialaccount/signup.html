@@ -1,0 +1,37 @@
+{% extends "blog/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Signup" %}{% endblock %}
+
+{% block header_title %}{% trans "Sign Up" %}{% endblock %}
+
+{% block head %}
+    <style>
+    .main-container{
+        background-color: transparent;
+        box-shadow: none;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row col-md-7 col-md-offset-2">
+            <p>
+                {% blocktrans with provider_name=account.get_provider.name site_name=site.name %}
+                    您即将使用您的 <strong>{{ provider_name }}</strong> 帐户登录 <strong>{{ site_name }}</strong>. 请填写下面表单:
+                {% endblocktrans %}
+            </p>
+
+            <form class="form-horizontal" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+                {% csrf_token %}
+                {% include 'account/bs3_form.html' %}
+                {% if redirect_field_value %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                {% endif %}
+                <button href="{{ signup_url }}" role="button" class="btn btn-success col-md-2 col-md-offset-4 col-xs-offset-4">{% trans "Sign Up" %}>></button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,2 @@
+{% load i18n %}
+{% blocktrans %}社交账户已经连接到另一个账户。{% endblocktrans %}

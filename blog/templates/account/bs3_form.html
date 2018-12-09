@@ -1,0 +1,44 @@
+{% load widget_tweaks %}
+
+<!--渲染隐藏的form表单内容-->
+{% for hidden_field in form.hidden_fields %}
+    {{ hidden_field }}
+{% endfor %}
+    <!--此方法返回Form.errors 与特定字段无关的错误列表。这包括ValidationError引发的s Form.clean()和使用的错误。-->
+{% if form.non_field_errors %}
+    <div class="alert alert-danger" role="alert">
+        {% for error in form.non_field_errors %}
+            {{ error }}
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% for field in form.visible_fields %}
+    {% if form.is_bound %}
+        {% if field.errors %}
+            <div class="form-group has-error">
+                <label class="control-label col-md-4" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="col-md-8">
+                    {% render_field field class="form-control"%}
+                </div>
+                {% for error in field.errors %}
+                    <span id="helpBlock2" class="help-block col-sm-offset-4">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="form-group has-success">
+                <label class="control-label col-md-4" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="col-md-8">
+                    {% render_field field class="form-control"%}
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="form-group">
+            <label class="control-label col-md-4" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <div class="col-md-8">
+                {% render_field field class="form-control"%}
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}

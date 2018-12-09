@@ -1,0 +1,20 @@
+{% extends "blog/base.html" %}
+
+{% load i18n %}
+
+{% block head_title %}{% trans "Login Cancelled" %}{% endblock %}
+{% block header_title %}{% trans "Login Cancelled" %}{% endblock %}
+
+{% block content %}
+
+{% url 'account_login' as login_url %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-7 col-md-offset-2">
+                <p>{% blocktrans %}您决定取消使用您的一个现有帐户登录我们的站点。如果这是一个错误，请继续 -->
+                <a href="{{ login_url }}">登录</a>.{% endblocktrans %}</p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
