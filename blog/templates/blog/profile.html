@@ -19,15 +19,56 @@
                     <div>
                         <p style="font-size: 30px;margin-left: 15px"><strong>{{ user.username }}</strong></p>
                         <ul class="nav nav-pills">
-                            <li role="presentation"><a href="#">修改昵称</a></li>
+                            <li role="presentation" data-toggle="modal" data-target="#Mymodal"><a href="#">修改昵称</a></li>
                             <li role="presentation"><a href="/accounts/password/change/">修改密码</a></li>
                         </ul>
                     </div>
                     <ul class="list-inline" style="margin-left: 10px">
-                        <li><span>最新登录:</span>sadasdsadsad</li>
+                        <li><span>最新登录:</span> {{ request.user.last_login }}</li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
+    <!--修改昵称的模态框-->
+    <div class="modal fade" id="Mymodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">请输入新的昵称</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group" style="margin: 10px">
+                        <input type="text" id="name" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!--设置退出模态框属性，data-dismiss="modal"-->
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="save">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+//   <script>
+        $.ajaxSetup({
+            headers: {"X-CSRFToken": '{{ csrf_token }}'},
+        });
+        $('#save').click(function () {
+            var name = $('#name').val();
+            if(name){
+                $.post("{% url 'profile' '个人信息' %}", {name:name}, function (msg) {
+                    if (msg=="1"){
+                        location.reload()
+                    }else {alert("该昵称已被占用")}
+                })
+            }else {alert("修改昵称不能为空")}
+        })
+//   </script>
 {% endblock %}

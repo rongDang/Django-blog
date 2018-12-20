@@ -1,17 +1,18 @@
-from django.shortcuts import render, HttpResponseRedirect, reverse
+from django.shortcuts import render, HttpResponseRedirect, reverse, HttpResponse
+from django.contrib.auth.decorators import login_required
 from pure_pagination import PageNotAnInteger, Paginator
 from blog.models import *
+from .forms import MDEditorForm
 import markdown
-from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
 
 
+# 首页显示，分页的使用
 def blog_index(request):
     print(request.user.is_authenticated)
     # 设置session一天后过期
     request.session.set_expiry(86400)
     for i in User.objects.all():
-        print(i.last_login)
+        print(i.username, "最后登录时间:", i.last_login)
     blog = Blog.objects.all().order_by("-create_time")
     # 分页测试
     try:
@@ -24,6 +25,7 @@ def blog_index(request):
     return render(request, 'blog/index.html', locals())
 
 
+# 内容和评论数据的渲染
 def blog_content(request, title):
     data = Blog.objects.get(title=title)
     # 正向查询该博客关联的类别，标签
@@ -35,6 +37,19 @@ def blog_content(request, title):
         'markdown.extensions.codehilite',
         'markdown.extensions.toc',
     ])
+    # 评论的表单和数据显示
+    form = MDEditorForm()
+    comments = Comments.objects.filter(blog=data)
+    test = []
+    for comm in comments:
+        b = {}
+        b["id"] = comm.id
+        b["content"] = markdown.markdown(comm.content, extensions=[
+            'markdown.extensions.extra',
+            'markdown.extensions.codehilite',
+            'markdown.extensions.toc',
+        ])
+        test.append(b)
     return render(request, 'blog/content.html', locals())
 
 
@@ -71,6 +86,18 @@ def tag(request, title):
 @login_required
 def profile(request, title):
     # 用户信息详情
+    if request.method == "POST":
+        name = request.POST.get("name")
+        user_id = request.user.id
+        try:
+            # 判断是否已经存在该用户名
+            user = User.objects.get(username=name)
+            return HttpResponse("0")
+        except:
+            user = User.objects.get(id=user_id)
+            user.username = name
+            user.save()
+            return HttpResponse("1")
     return render(request, 'blog/profile.html', locals())
 
 
@@ -80,5 +107,13 @@ def logout(request):
     return HttpResponseRedirect(reverse("blog_index"))
 
 
-
+# 评论内容的提交
+def submit_comment(request):
+    # 评论者为登录用户，回复对象为评论表对象，可以为空，blog为评论对应的文章，content为评论的内容
+    user_id = request.user.id
+    reply = request.POST.get("reply")
+    blog = request.POST.get("blog")
+    content = request.POST.get("content")
+    Comments.objects.create(content=content, blog_id=blog, parent_comment_id=reply, user_id=user_id)
+    return HttpResponse("1")
 

@@ -1,6 +1,11 @@
 # -*- encoding:utf8 -*-
-import re
 from django import forms
-from django.contrib.auth.models import User
+from mdeditor.fields import MDTextFormField
+
+
+# mdedtior富文本编辑器的前端form表单
+class MDEditorForm(forms.Form):
+    content = MDTextFormField(config_name='form_config')
+
 
 

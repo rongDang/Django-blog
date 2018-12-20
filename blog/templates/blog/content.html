@@ -3,6 +3,16 @@
 {% load static comments %}
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/code.css' %}">
+    <style>
+        .media a{color: brown}
+        .media a:hover{color: red}
+        .parent{
+            background-color: #f5f5f5;
+            margin: 5px 0px 5px;padding: 10px 10px 10px 10px;
+            border: 1px solid #eaeaea; font-size: 14px !important;
+            color: #666;
+        }
+    </style>
 {% endblock %}
 
 <!--标题，分类-->
@@ -32,12 +42,111 @@
 <!--博客内容-->
 {% block content %}
     {{ content|safe }}
+    <hr>
+    <div class="panel panel-info" id="editor">
+        <div class="panel-heading" style="font-size: 18px">
+            {% if user.is_authenticated %}
+                <span class="glyphicon glyphicon-user"></span> {{ user.username }}
+                <strong id="reply" style="display: none">回复：<span style="color: #ff8b2f" id="reply_name"></span></strong>
+            {% else %}
+                尚未登录，请 <a href="/accounts/login/" style="color: #ff954b">登录</a> 后参与评论
+            {% endif %}
+        </div>
+        <div class="panel-body" style="padding: 0px;height: 300px">
+            <form id="form_comment" method="post">
+                {% csrf_token %}
+                {{ form.media }}
+                {{ form.content }}
+                <!--文章id，回复对象id-->
+                <input type="text" name="blog" value="{{ data.id }}" style="display: none">
+                <input type="text" id="name" name="reply" value="" style="display: none">
+            </form>
+        </div>
+        <div class="panel-footer col-md-offset-8 col-sm-offset-7" style="background-color: transparent;">
+            <button class="btn btn-danger" style="display: none"><span class="glyphicon glyphicon-remove"></span> 取消回复</button>
+            <button class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> 提交评论</button>
+        </div>
+    </div>
+    <!--循环该文章下所有的评论-->
+    {% for comment in comments %}
+        <div class="media" style="border-bottom: dashed 1px #7f8c8d; padding-top: 20px">
+            <div class="media-body">
+                <h4 class="media-heading">
+                    <span class="glyphicon glyphicon-user" id="{{ comment.id }}"></span> {{ comment.user.username }}
+                </h4>
+                <!--test是渲染后的markdown评论数据,只存在id和content-->
+                {% for foo in test %}
+                    <div style="max-height: 300px;overflow: auto;margin-left:70px">
+                        {% if foo.id == comment.id %}
+                            <!--判断父级评论，如果当前评论存在父级评论则将父级评论显示出来-->
+                            {% if comment.parent_comment %}
+                                {% for i in test %}
+                                    <!--如果评论的渲染后的评论id等于当前评论的父级评论id则将其显示出来-->
+                                    {% if i.id == comment.parent_comment.id %}
+                                        <div class="parent">
+                                            @ <a href="#{{ i.id }}">{{ comment.parent_comment.user.username }}</a>
+                                            <div style="max-height: 150px;overflow: auto;margin-left: 20px">{{ i.content | safe }}</div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {{ foo.content | safe }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <a href="#editor" class="pull-right" onclick="reply('{{ user.username }}','{{ comment.user.username }}','{{ comment.id }}')">回复</a>
+            </div>
+        </div>
+    {% endfor %}
 {% endblock %}
 
 <!--JavaScript-->
 {% block js %}
-    $(function(){
-        //给标签添加bootstrap类，使其靠右
-        $(".header-subtitle").addClass("pull-right")
-    })
+    //<script>
+        $(function(){
+            //给标签添加bootstrap类，使其靠右
+            $(".header-subtitle").addClass("pull-right");
+        });
+        function reply(name,user,name_id) {
+            if (name==""){
+                alert('需要登录才能回复哦！')
+            }else {
+                $('#name').attr("value",name_id);//这里设置form中的被回复者的用户名
+                $('.btn-danger').show();
+                $('#reply').show();
+                $('#reply_name').text(user)
+            }
+        }
+        $('.btn-danger').click(function () {
+            $('#name').attr("value","");
+            $('.btn-danger').hide();
+            $('#reply').hide();
+        });
+        //提交评论
+        $('.btn-success').click(function () {
+            var content = $("textarea[name='content']").val();
+            if('{{ user.username }}'==""){
+                alert("请登录后再评论！")
+            }else if(content==""){
+                alert("评论不能为空")
+            }else {
+                //通过serialize()将表单数据传到后台，中间有包括被回复者，
+                // 如果被回复者存在于数据库中则添加评论的父级评论为被回复者的那条数据，id对应
+                $.ajax({
+                    type: "POST",
+                    data: $('#form_comment').serialize(),
+                    url: "{% url 'submit_comment' %}",
+                    dataType: "json",
+                    success: function(msg) {
+                        alert(msg);
+                        //提交成功后重新加载当前页面,可以再写一个Ajax，后台邮件提示我有新的评论
+                        window.location.reload();
+                    },
+                    error: function () {
+                        alert("评论出错");
+                    }
+                });
+            }
+        })
+        //</script>
 {% endblock %}

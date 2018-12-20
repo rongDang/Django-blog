@@ -34,6 +34,7 @@
 
         使用Navicat数据库连接mysql8.0版本时可能会提示2059 - authentication plugin 解决办法如下：
         alter user 'root'@'localhost' identified with mysql_native_password by '你的密码';
+    密码：Root123!
 
 3.安装python3.6
     CentOS7.3默认安装了python2.7.5，可以同过python -V来查看python版本，which python来查看python.exe文件位置
@@ -76,6 +77,7 @@ pip freeze > requirements.txt 导出项目依赖的包名到文件中
         mkvirtualenv -p /usr/bin/python3 env_name  (最后的env_name为虚拟环境的名称)
 
     在虚拟环境中安装requirements.txt文件中所有的包(requirements.txt文件通过WinSCP软件上传到CentOS上去)
+    通过workon命令就可以查看所有虚拟环境的目录，进入该虚拟环境， deactivate退出虚拟环境，(删除虚拟环境:rmvirtualenv 虚拟环境名)
 
 在CentOS的python虚拟环境中下载这些依赖包:pip install -r requirements.txt
 错误一：
@@ -86,4 +88,15 @@ pip freeze > requirements.txt 导出项目依赖的包名到文件中
     安装mysqlclient时可能会出错，显示OSError: mysql_config not found，mysql_config 找不到,
     所以导致mysqlclient安装不上,centos需要再安装下面这些依赖就可以有mysql_config了.
     解决：yum install mysql-devel gcc gcc-devel python-devel
+
+4.服务器centOS安装uwsgi
+    nginx+uwsgi+django是我们常用的django部署方式。nginx作为最前端的服务器，他负责接收所有的客户端请求，
+    对于请求的静态文件，由nginx服务器自己完成，因为它具有很好处理静态文件的能力，性能进行过优化，支持高并发量；
+    uWSGI服务器作为支持服务器，是用来服务nginx的，nginx将请求的动态文件交给uWSGI进行处理。
+    uWSGI实现了uwsgi、wsgi和http协议，uwsgi协议是uWSGI自定义的协议，定义的是框架（django）和服务器对接的接口。
+
+
+
+
+
 

@@ -48,15 +48,19 @@ class Blog(models.Model):
         return self.title
 
 
-# class UserProfile(models.Model):
-#     # 和Django自带的User模型是一对一关系，其实就相当于是一个表
-#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-#     org = models.CharField('Organization', max_length=128, blank=True)
-#     telephone = models.CharField('Telephone', max_length=50, blank=True)
-#     mod_date = models.DateTimeField('last modified', auto_now=True)
-#
-#     class Meta:
-#         verbose_name = 'user Profile'
-#
-#     def __str__(self):
-#         return "{}'s profile".format(self.user.__str__())
+class Comments(models.Model):
+    """
+        评论表: 评论对象(文章), 父级评论(当前评论表),评论者，评论内容，评论时间
+    """
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    parent_comment = models.ForeignKey('Comments', on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = MDTextField()
+    create_time = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "评论"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return '%s 评论了 %s' % (self.user.username, self.blog)

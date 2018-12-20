@@ -63,3 +63,12 @@ class Blog_Admin(admin.ModelAdmin):
             tag_number = obj_tag.blog_set.count()
             obj_tag.number = tag_number
             obj_tag.save()
+
+
+@admin.register(Comments)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('id', 'blog', 'parent_comment', 'user', 'create_time')
+    list_display_links = ('id', 'blog')
+
+
+
