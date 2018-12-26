@@ -1,13 +1,26 @@
 # 在服务器上安装nginx ，MySQL， python3.6，pip3,创建虚拟环境，安装uwsgi
 
 1，安装nginx:
+    Nginx是一款轻量级的Web 服务器/反向代理服务器及电子邮件（IMAP/POP3）代理服务器，并在一个BSD-like 协议下发行。
+    其特点是占有内存少，并发能力强，事实上nginx的并发能力确实在同类型的网页服务器中表现较好。
     先安装epel-release源，并进行安装：1.yum install epel-release 2.yum update 3.yum install nginx
 
     防火墙执行相关的应用操作: systemctl start nginx(启动)  systemctl stop nginx #停止
     systemctl restart nginx #重启  systemctl status nginx #查看运行状态  systemctl enable nginx #开机启动
     pkill -f nginx (关闭nginx)   nginx(启动)
 
-2，安装MySQL8.0:
+    在启动完以后可能无法通过IP访问，需要进一步设置防火墙：
+    firewall-cmd --permanent --zone=public --add-service=http
+    firewall-cmd --permanent --zone=public --add-service=https
+    firewall-cmd --reload  ---- 如果执行显示FirewallD is not running 那么就是防火墙没有开启，解决办法如下
+    通过systemctl status firewalld查看firewalld状态，发现当前是dead状态，即防火墙未开启。
+    通过systemctl start firewalld开启防火墙，没有任何提示即开启成功。
+    再次通过systemctl status firewalld查看firewalld状态，显示running即已开启了。（绿色状态）
+    //如果要关闭防火墙设置，可能通过systemctl stop firewalld这条指令来关闭该功能。
+
+
+
+2，安装MySQL8.0:(需要在阿里云开启对应的3306端口)
     1、yum仓库下载MySQL：sudo yum localinstall https://repo.mysql.com//mysql80-community-release-el7-1.noarch.rpm
 
     2、yum安装MySQL：sudo yum install mysql-community-server
@@ -17,23 +30,42 @@
     4、检查MySQL服务状态：sudo service mysqld status
 
     5、查看初始密码（如无内容直接跳过）：sudo grep 'temporary password' /var/log/mysqld.log
-    建议直接 vim /etc/my.cnf ，在配置文件中添加 skip-grant-tables(跳过密码验证)，然后再 mysql -u root -p 登录
 
-    6. 更改密码: use mysql; ---> update user set authentication_string='' where user='root';(将root密码置空)
+    6. 更改密码:
+    建议直接 vim /etc/my.cnf ，在配置文件中添加 skip-grant-tables(跳过密码验证)，然后再 mysql -u root -p 登录
+    use mysql; ---> update user set authentication_string='' where user='root';(将root密码置空)
     --->删除my.cnf中的skip-grant-tables --->service mysqld restart(重启MySQL服务)--->登录MySQL
     --->mysql> ALTER user 'root'@'localhost' IDENTIFIED BY 'Root123!';(密码太简单不会通过)
 
     7.关于MySQL8.0版本的远程访问权限设置：（新版的的mysql版本已经将创建账户和赋予权限的方式分开了）
         select host, user, authentication_string, plugin from user; 查看相关信息可知，root用户只支持本地访问
-        GRANT ALL ON *.* TO 'root'@'%'; 授权root用户的所有权限并设置远程访问，修改后再查看root的host已经变为%
+        问题解决方法：
+            ERROR 1410 (42000): You are not allowed to create a user with GRANT.
+            GRANT ALL ON *.* TO 'root'@'%';命令实际上相当于先创建了一个host为%, 用户名为root的用户, 然后为这个用户赋权.
+            以前的版本可以, 但是8.0不允许grant授权的同时隐式创建用户. 所以需要先创建用户,然后再进行授权
+            1，为MySQL创建用户:rong, 密码为:
+                CREATE USER rong IDENTIFIED BY 'Root123!';
+            2,给用户授权
+            意思是让root在所有机器都可以登陆到MYSQL服务器(拥有所有权限)这样在Navicat中就可以给阿里云的MySQL创建数据库了
+            GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+            UPDATE mysql.user SET Grant_priv='Y', Super_priv='Y' WHERE User='rong';
+
         使用Navicat等可视化工具连接时输入用户，密码，会提示2059错误，这是因为 MySql8.0版本和旧版本的加密规则不一样，
         而现在的可视化工具只支持旧的加密方式，所以需要更改MySQL8.0用户登录的加密规则：mysql_native_password
-
         ALTER USER 'root'@'%' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER; 修改加密规则
         ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'password'; 更新root用户密码
 
-        使用Navicat数据库连接mysql8.0版本时可能会提示2059 - authentication plugin 解决办法如下：
-        alter user 'root'@'localhost' identified with mysql_native_password by '你的密码';
+        注意：完成这些后还是不能连接阿里云的MySQL，需要修改配置文件， vim /etc/my.cnf 在最下面添加 : bind-address = 0.0.0.0，允许外部访问
+        重启MySQL服务：systemctl restart mysqld.service
+
+        开启防火墙的端口设置， 重要：开启防火墙后才能使用对应的端口
+        CentOS7的默认防火墙为firewall,且默认是不打开的。
+        systemctl start firewalld    #启动friewall
+        systemctl status firewalld 查看firewall启动情况
+        firewall-cmd --zone=public --add-port=3306/tcp --permanent 开启3306端口
+        firewall-cmd --reload  #重启防火墙
+        firewall-cmd --list-ports   #检查打开的端口
+
     密码：Root123!
 
 3.安装python3.6
@@ -65,6 +97,7 @@ pip freeze > requirements.txt 导出项目依赖的包名到文件中
     2，安装virtualenvwrapper
         pip install virtualenvwrapper   #安装到python2中
         pip3 install virtualenvwrapper   #安装到python3中
+        需要注意的是这两个都得装，如果只装python3的话，workon命令是用不了的。
     3，查找位置:
         find / -name virtualenvwrapper.sh
     4，编辑配置文件
@@ -78,8 +111,8 @@ pip freeze > requirements.txt 导出项目依赖的包名到文件中
 
     在虚拟环境中安装requirements.txt文件中所有的包(requirements.txt文件通过WinSCP软件上传到CentOS上去)
     通过workon命令就可以查看所有虚拟环境的目录，进入该虚拟环境， deactivate退出虚拟环境，(删除虚拟环境:rmvirtualenv 虚拟环境名)
+    在CentOS的python虚拟环境中下载这些依赖包:pip install -r requirements.txt
 
-在CentOS的python虚拟环境中下载这些依赖包:pip install -r requirements.txt
 错误一：
 出现Command "python setup.py egg_info" failed with error code 1 in /tmp/pip-build*解决办法
     解决：easy_install -U setuptools
@@ -95,6 +128,76 @@ pip freeze > requirements.txt 导出项目依赖的包名到文件中
     uWSGI服务器作为支持服务器，是用来服务nginx的，nginx将请求的动态文件交给uWSGI进行处理。
     uWSGI实现了uwsgi、wsgi和http协议，uwsgi协议是uWSGI自定义的协议，定义的是框架（django）和服务器对接的接口。
 
+    创建配置文件：
+        在我的项目中创建一个文件夹里面存放我们创建的uwsgi配置文件,例如  uwsgi.ini
+            [uwsgi]
+            chdir           = /root/blog
+            module          = blog.wsgi
+            master          = true
+            processes       = 5
+            socket          = 127.0.0.1:8000
+            vacuum          = true
+            virtualenv = /root/.virtualenvs/blog_env_py3
+
+        修改项目
+        settings文件：STATIC_ROOT = os.path.join(BASE_DIR, 'static'),DEBUG = False,ALLOWED_HOSTS = ['*']
+
+        urls.py中添加静态文件的访问处理函数
+        from django.views.static import serve
+        from untitled2.settings import STATIC_ROOT
+        re_path(r'^static/(?P<path>.*)/$', serve, {'document_root': STATIC_ROOT}),
+
+配置nginx   (https://uwsgi-docs-zh.readthedocs.io/zh_CN/latest/tutorials/Django_and_nginx.html#id11)
+    创建nginx设置文件  blog_niginx.conf
+    upstream django {
+    server 127.0.0.1:8000; # for a web port socket (we'll use this first)
+    }
+    server {
+        # the port your site will be served on
+        listen      80;
+        # the domain name it will serve for
+        server_name 47.107.46.222 www.rongdang.top ; # 公网IP和备案后的域名
+        charset     utf-8;
+
+        # max upload size
+        client_max_body_size 75M;   # adjust to taste
+
+        # Django media
+        location /media  {
+            alias /root/blog/media/;  # 指向django的media目录
+        }
+        location /static {
+            alias /root/blog/static/; # 指向django的static目录
+        }
+        # Finally, send all non-media requests to the Django server.
+        location / {
+            uwsgi_pass  django;
+            include     uwsgi_params; # the uwsgi_params file you installed
+        }
+    }
+
+    运行命令，搜集所有的静态文件到static下，包括admin中 ：python manage.py collectstatic
+
+    nginx   启动nginx
+    uwsgi -i /root/Django_blogs/conf/uwsgi.ini &
+
+将项目上传到服务器中进行测试运行时需要进入到对应版本的虚拟环境中运行。
+不然执行python manage.py runserver 0.0.0.0:9000会出问题，测试运行项目时要开启对应的端口，不然还是无法访问
+到阿里云控制台的防火墙开启9000这个端口，否则就算Django运行了还是无法访问，Centos开启对应端口，例如3306
+
+1，通过uwsgi运行项目，测试uwsgi是否运行正常:
+    新建 test.py 文件，内容如下：
+    def application(env, start_response):
+        start_response('200 OK', [('Content-Type','text/html')])
+        return "Hello World"
+
+    终端运行:uwsgi --http :9000 --wsgi-file test.py  如果端口没有开启则无法访问
+    如果端口被占用则关闭对应端口 killall -9 uwsgi
+
+    可以使用uwsgi的http协议访问自己django写的网站，例如：
+        uwsgi --http :8001 --chdir /root/mysite --home /root/mysite_env --module mysite.wsgi:application
+        /root/mysite  --> 指定项目所在路径， /root/mysite_env --> 指定项目的虚拟环境 ，这里mysite为我们的项目名
+        注意:如果是在系统环境中运行该代码，系统环境中要有项目所有的python包，这里我是进入虚拟环境中运行。
 
 
 
