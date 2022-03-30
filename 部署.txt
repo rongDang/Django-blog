@@ -132,10 +132,12 @@ pip freeze > requirements.txt 导出项目依赖的包名到文件中
         在我的项目中创建一个文件夹里面存放我们创建的uwsgi配置文件,例如  uwsgi.ini
             [uwsgi]
             chdir           = /root/blog
-            module          = blog.wsgi
+            module          = blog.wsgi # 加载一个WSGI模块,这里加载blog/wsgi.py这个模块
             master          = true
-            processes       = 5
-            socket          = 127.0.0.1:8000
+            processes       = 4         # 启动4个进程，按核心数设置
+            threads         = 8         # 启动8个线程
+            enable-threads  = true      # 开启多线程模式
+            socket          = 127.0.0.1:8000 # socket通信方式，单主机时建议使用。  多主机通信时，使用http的方式 http = 127.0.0.1:8000
             vacuum          = true
             virtualenv = /root/.virtualenvs/blog_env_py3
 
@@ -171,7 +173,7 @@ pip freeze > requirements.txt 导出项目依赖的包名到文件中
         }
         # Finally, send all non-media requests to the Django server.
         location / {
-            uwsgi_pass  django;
+            uwsgi_pass  django;     # 单主机使用socket通信，多主机时使用http方式， proxy_pass  http://django;
             include     uwsgi_params; # the uwsgi_params file you installed
         }
     }
